@@ -14,28 +14,22 @@ pipeline {
         stage('Create Dockerfile') {
             steps {
                 sh '''
-                cat > Dockerfile <<EOF
-                FROM nginx:latest
-                COPY index.html /usr/share/nginx/html/index.html
-                EXPOSE 80
-                EOF
+                echo "FROM nginx:latest" > Dockerfile
+                echo "COPY index.html /usr/share/nginx/html/index.html" >> Dockerfile
+                echo "EXPOSE 80" >> Dockerfile
                 '''
             }
         }
 
         stage('Build Image') {
             steps {
-                sh '''
-                docker build -t my-nginx .
-                '''
+                sh 'docker build -t my-nginx .'
             }
         }
 
         stage('List Image') {
             steps {
-                sh '''
-                docker images | grep my-nginx || true
-                '''
+                sh 'docker images | grep my-nginx || true'
             }
         }
 
