@@ -1,21 +1,43 @@
 pipeline {
     agent any
     stages {
-        stage('clear workspace') {
+        stage('Clean Workspace') {
             steps {
                 cleanWs()
             }
         }
-        stage('checkout SCM') {
+        
+        stage('Checkout SCM') {
             steps {
                 sh "git clone https://github.com/anwar132005-boop/githubeval.git"
             }
         }
-        stage('docker build image nginx') {
+        
+        stage('Create Dockerfile') {
             steps {
-                dir('githubeval') {        
+                dir('githubeval') {
+                    writeFile file: 'Dockerfile', text: '''
+                        FROM nginx:alpine
+                        LABEL maintainer="jenkins@example.com"
+                        EXPOSE 80
+                        CMD ["nginx", "-g", "daemon off;"]
+                    '''
+                    sh 'cat Dockerfile'
+                }
+            }
+        }
+        
+        stage('Docker Build') {
+            steps {
+                dir('githubeval') {
                     sh 'docker build -t my-nginx .'
                 }
+            }
+        }
+        
+        stage('Docker Verify') {
+            steps {
+                sh 'docker images | grep my-nginx'
             }
         }
     }
