@@ -4,21 +4,23 @@ pipeline {
  
 
     stages {
-        stage('Checkout SCM') {
-            steps {
-                git branch: 'main', url: 'https://github.com/anwar132005-boop/githubeval.git'
-            }
-        }
 
  
 
         stage('Install Docker') {
             steps {
-                sh '''
-                chmod +x install_docker.sh
-                sudo ./install_docker.sh
-                '''
+                sh 'sudo apt autoremove docker*'
+                sh 'sudo apt update'
+                sh 'sudo apt install apt-transport-https ca-certificates curl software-properties-common -y'
+                sh 'sudo apt install docker.io -y'
+                sh 'sudo chmod 666 /var/run/docker.sock'
+                sh 'sudo usermod -aG docker $USER'
+                sh 'sudo systemctl start docker.service'
+                sh 'sudo systemctl status docker.service'
             }
         }
+
+ 
+
     }
 }
