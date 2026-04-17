@@ -1,26 +1,20 @@
 pipeline {
-    agent any
+    agent any
 
- 
-
-    stages {
-
- 
-
-        stage('Install Docker') {
-            steps {
-                sh 'sudo apt autoremove docker*'
-                sh 'sudo apt update'
-                sh 'sudo apt install apt-transport-https ca-certificates curl software-properties-common -y'
-                sh 'sudo apt install docker.io -y'
-                sh 'sudo chmod 666 /var/run/docker.sock'
-                sh 'sudo usermod -aG docker $USER'
-                sh 'sudo systemctl start docker.service'
-                sh 'sudo systemctl status docker.service'
-            }
-        }
-
- 
-
-    }
+    stages {
+        stage('Install Docker') {
+            steps {
+                sh '''
+                    sudo apt autoremove docker* -y
+                    sudo apt update
+                    sudo apt install -y apt-transport-https ca-certificates curl software-properties-common
+                    sudo apt install -y docker.io
+                    sudo chmod 666 /var/run/docker.sock
+                    sudo usermod -aG docker $USER
+                    sudo systemctl start docker
+                    sudo systemctl status docker --no-pager
+                '''
+            }
+        }
+    }
 }
