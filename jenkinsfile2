@@ -4,16 +4,23 @@ pipeline {
     stages {
         stage('Install Docker') {
             steps {
-                sh '''
-                    sudo apt autoremove docker* -y
-                    sudo apt update
-                    sudo apt install -y apt-transport-https ca-certificates curl software-properties-common
-                    sudo apt install -y docker.io
-                    sudo chmod 666 /var/run/docker.sock
-                    sudo usermod -aG docker $USER
-                    sudo systemctl start docker
-                    sudo systemctl status docker --no-pager
-                '''
+                script {
+                    // Vérifier si Docker est déjà installé
+                    def dockerExists = sh(script: 'command -v docker', returnStatus: true) == 0
+                    
+                    if (!dockerExists) {
+                        sh '''
+                            # Utiliser expect ou passer par un script shell avec gestion d'erreur
+                            echo 'Installing Docker...'
+                        '''
+                        
+                        // Alternative : utiliser apt-get sans sudo (si Jenkins est root - non recommandé)
+                        // Ou mieux : utiliser Docker pipeline plugin
+                    }
+                }
+                
+                // Si vous devez absolument utiliser sudo, faites-le comme ceci :
+                sh 'echo "password" | sudo -S apt update'  # Pas sécurisé!
             }
         }
     }
