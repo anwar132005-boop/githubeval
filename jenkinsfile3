@@ -1,0 +1,43 @@
+pipeline {
+    agent any
+
+    stages {
+
+        stage('Prepare App') {
+            steps {
+                sh '''
+                echo "<h1>My Nginx Image 🚀</h1>" > index.html
+                '''
+            }
+        }
+
+        stage('Create Dockerfile') {
+            steps {
+                sh '''
+                cat > Dockerfile <<EOF
+                FROM nginx:latest
+                COPY index.html /usr/share/nginx/html/index.html
+                EXPOSE 80
+                EOF
+                '''
+            }
+        }
+
+        stage('Build Image') {
+            steps {
+                sh '''
+                docker build -t my-nginx .
+                '''
+            }
+        }
+
+        stage('List Image') {
+            steps {
+                sh '''
+                docker images | grep my-nginx || true
+                '''
+            }
+        }
+
+    }
+}
