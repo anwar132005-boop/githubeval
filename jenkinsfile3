@@ -1,22 +1,22 @@
 pipeline {
-    agent any
-    stages {
-        stage('clear workspace') {
-            steps {
-                cleanWs()
-            }
-        }
-        stage('checkout SCM') {
-            steps {
-                 sh "git clone https://github.com/anwar132005-boop/githubeval.git"
-            }
-        }
-       stage('docker build image nginx') {
-            steps {
-                dir('githubeval') {        
-                    sh 'docker build -t my-nginx .'
-                }
-            }
-        }
-    }
+    agent any
+    stages {
+        stage('clear workspace') {
+            steps {
+                cleanWs()
+            }
+        }
+        stage('checkout SCM') {
+            steps {
+                sh "git clone https://github.com/anwar132005-boop/githubeval.git"
+            }
+        }
+        stage('docker build image nginx') {
+            steps {
+                dir('githubeval') {        
+                    sh 'docker build -t my-nginx .'
+                }
+            }
+        }
+    }
 }
