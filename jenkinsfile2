@@ -1,27 +1,24 @@
 pipeline {
-    agent any
+    agent any
 
-    stages {
-        stage('Install Docker') {
-            steps {
-                script {
-                    // Vérifier si Docker est déjà installé
-                    def dockerExists = sh(script: 'command -v docker', returnStatus: true) == 0
-                    
-                    if (!dockerExists) {
-                        sh '''
-                            # Utiliser expect ou passer par un script shell avec gestion d'erreur
-                            echo 'Installing Docker...'
-                        '''
-                        
-                        // Alternative : utiliser apt-get sans sudo (si Jenkins est root - non recommandé)
-                        // Ou mieux : utiliser Docker pipeline plugin
-                    }
-                }
-                
-                // Si vous devez absolument utiliser sudo, faites-le comme ceci :
-                sh 'echo "password" | sudo -S apt update'  # Pas sécurisé!
-            }
-        }
-    }
+ 
+
+    stages {
+        stage('Checkout SCM') {
+            steps {
+                git branch: 'main', url: 'https://github.com/anwar132005-boop/githubeval.git'
+            }
+        }
+
+ 
+
+        stage('Install Docker') {
+            steps {
+                sh '''
+                chmod +x install_docker.sh
+                sudo ./install_docker.sh
+                '''
+            }
+        }
+    }
 }
