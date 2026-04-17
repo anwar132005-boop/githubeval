@@ -1,22 +1,58 @@
-sudo apt update
-sudo apt upgrade -y
-sudo apt install ca-certificates curl gnupg lsb-release -y
+pipeline {
+    agent any
+    stages {
+        stage('clear workspace') {
+            steps {
+                cleanWs()
+            }
+        }
+    stage('checkout SCM') {
+            steps {
+               // sh "git clone"
+                git branch: 'main', credentialsId: 'etudiant', url: 'https://github.com/anwar132005-boop/githubeval.git'
+                //git branch: 'main', credentialsId: '12cda8db-12cb-458a-8b2f-e124a2063c38', url: 'https://github.com/WooD3Nz/SRCops.git'
+            }
+        }
+        stage('install docker') {
+            steps {
+                sh '''
+                    sudo apt update
+                    sudo apt upgrade -y
+                    sudo apt install ca-certificates curl gnupg lsb-release -y
 
  
 
-# Clé GPG Docker
-sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /tmp/docker.gpg
-sudo gpg --batch --yes --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg /tmp/docker.gpg
+                    sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /tmp/docker.gpg
+                    sudo gpg --batch --yes --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg /tmp/docker.gpg
 
  
 
-# Ajout du dépôt Docker
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] \
+                    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] \
 https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" \
-| sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+                    | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 
  
 
-# Installation Docker
-sudo apt update
-sudo apt install docker-ce docker-ce-cli containerd.io -y
+                    sudo apt update
+                    sudo apt install docker-ce docker-ce-cli containerd.io -y
+
+                    sudo chmod 666 /var/run/docker.sock
+                    sudo usermod -aG docker $USER
+
+                    sudo docker run hello-world
+                '''
+            }
+        }
+        stage('test create container') {
+            steps {
+                sh '''
+                    docker image ls
+                    docker pull ubuntu/apache2
+                    docker run -d --name container01 --hostname container01 ubuntu/apache2
+                    docker ps
+
+                '''
+            }
+        }
+    }
+}
